@@ -1,1 +1,225 @@
 # bc-migration-tool
+
+This project is a tool designed to assist BC(BNB beacon chain) validators in migrating to BSC(BNB smart chain) after BC-fusion upgrade. 
+
+The migration process generally involves three stages: 
+1. undelegate all funds on the BC side; 
+2. cross-chain transfer the funds to BSC after the unlock period; 
+3. creating a validator on the BSC side. 
+
+## Prerequisites
+- go 1.21+
+
+## Installation
+
+### Install this tool
+
+```shell
+git clone https://github.com/bnb-chain/bc-migration-tool.git
+cd bc-migration-tool
+go build -o bin/bc-migration-tool main.go
+```
+
+### Install `bnbcli`
+
+For more information of the installation and usage of `bnbcli`, you can also refer to [bnbcli](https://github.com/bnb-chain/node/blob/master/README.md).
+
+```shell
+git clone https://github.com/bnb-chain/node.git
+cd node
+make build
+cp build/bnbcli ${workspace}/bin
+```
+
+### Install `geth`
+
+```shell
+git clone https://github.com/bnb-chain/bsc.git
+cd bsc
+make geth
+cp build/bin/geth ${workspace}/bin
+```
+
+## Preparation
+
+Before you start, you need to prepare your BC account and BSC account.
+
+### 1. Set up BC account
+
+We require you to import your BC account into `bnbcli`. If you have already set up the account, you can skip this step.
+
+#### Existing account
+
+Your account info will be stored at `~/.bnbcli/keys` by default. You can check your account info by running the following command:
+
+```shell
+${workspace}/bin/bnbcli keys show <your-account-name> --home ${HOME}/.bnbcli
+```
+
+#### Import account by mnemonic
+
+If you have mnemonic, you can import your account by running the following command:
+
+```shell
+$ ${workspace}/bin/bnbcli keys add <your-account-name> --recover --home ${HOME}/.bnbcli
+Enter a passphrase for your key:
+Repeat the passphrase:
+> Enter your recovery seed phrase:
+```
+
+You will be asked to set a password for this account and input your mnemonic. After that, you will get your account info.
+
+#### Import account from ledger
+
+If you have ledger, you can import your account by running the following command:
+
+```shell
+${workspace}/bin/bnbcli keys add <your-account-name> --ledger --home ${HOME}/.bnbcli
+```
+
+### 2. Set up BSC account
+
+You can set up your BSC account by providing keystore file or private key lately. 
+
+### 3. Set up BLS account
+
+To create a validator, you need to provide a BLS address. And this address should not be the same as the one you ever used on the BC side.
+
+You can create a new BLS account by running the following command:
+
+```shell
+${workspace}/bin/geth bls account new --datadir ${datadir}
+```
+
+If you don't have a wallet folder under `${datadir}`, this will help you create a new wallet at first. The wallet file will be stored at `${datadir}/bls`.
+
+And if you have already created a wallet, you need to provide the password for your wallet.
+
+After that, you will get your BLS account info like this:
+
+```shell
+INFO[0003] Successfully imported validator key(s)        prefix=local-keymanager publicKeys=0x000000000000
+```
+
+The key info is `0x000000000000` in this case.
+
+## Usage
+
+### Undelegate all funds on the BC side
+
+#### Undelegate
+
+You can undelegate all funds on the BC side by running the following command:
+
+```shell
+${workspace}/bin/bnbcli staking bsc-unbond \
+    --chain-id ${BC_CHAIN_ID} \
+    --side-chain-id ${BSC_CHAIN_NAME} \
+    --from ${ACCOUNT_NAME} \
+    --validator ${VALIDATOR_ADDR} \
+    --amount ${AMOUNT}:BNB \
+    --node ${BC_NODE_URL} --trust-node \
+    --home ${HOME}/.bnbcli
+```
+
+- `${workspace}/bin/bnbcli`: The path to the `bnbcli` binary executable.
+
+- `--chain-id ${BC_CHAIN_ID}`: Specifies the chain ID for the BC(BNB beacon chain). By default, the mainnet chain ID is `Binance-Chain-Tigris`.
+
+- `--side-chain-id ${BSC_CHAIN_NAME}`: Specifies the chain ID for the BSC(BNB Smart Chain). By default, the mainnet chain ID is `56`.
+
+- `--from ${ACCOUNT_NAME}`: Specifies the account name from which the unbonding operation will be performed.
+
+- `--validator ${VALIDATOR_ADDR}`: Specifies the validator address for which the unbonding operation is intended.
+
+- `--amount ${AMOUNT}:BNB`: Specifies the amount to be unbonded, along with the asset type (BNB in this case). Note that the decimal is 10.
+
+- `--node ${BC_NODE_URL} --trust-node`: Specifies the BC node URL and instructs `bnbcli` to trust the node.
+
+- `--home ${HOME}/.bnbcli`: Specifies the bnbcli home directory where the key file imported above is stored.
+
+You will be asked to input the password for your account.
+
+### Cross-chain transfer
+
+After the unlock period, you can cross-chain transfer the funds to BSC by running the following command:
+
+```shell
+${workspace}/bin/bnbcli bridge transfer-out \
+    --to ${BSC_ADDRESS} \
+    --chain-id ${BC_CHAIN_ID} \
+    --from ${ACCOUNT_NAME} \
+    --amount ${AMOUNT}:BNB \
+    --expire-time ${EXPIRE_TIME} \
+    --node ${BC_NODE_URL} --trust-node \
+    --home ${HOME}/.bnbcli
+```
+
+- `${workspace}/bin/bnbcli`: The path to the `bnbcli` binary executable.
+
+- `--to ${BSC_ADDRESS}`: Specifies the BSC address to which the funds will be transferred. Usually, it should be your operator address on the BSC side.
+
+- `--chain-id ${BC_CHAIN_ID}`: Specifies the chain ID for the BC(BNB beacon chain). By default, the mainnet chain ID is `Binance-Chain-Tigris`.
+
+- `--from ${ACCOUNT_NAME}`: Specifies the account name from which the unbonding operation will be performed.
+
+- `--amount ${AMOUNT}:BNB`: Specifies the amount to be unbonded, along with the asset type (BNB in this case). Note that the decimal is 10.
+
+- `--expire-time ${EXPIRE_TIME}`: Specifies the expiry time(unix) of the cross-chain transfer. The expire time should be greater than the current time.
+
+- `--node ${BC_NODE_URL} --trust-node`: Specifies the BC node URL and instructs `bnbcli` to trust the node.
+
+- `--home ${HOME}/.bnbcli`: Specifies the bnbcli home directory where the key file imported above is stored.
+
+You will be asked to input the password for your account.
+
+#### After BC-fusion
+
+After BC-fusion upgrade, the cross-chain transfer will be closed. You can recover your funds on the BSC side through the following steps:
+
+// TODO
+
+### Create a validator on the BSC side
+
+First, you need to modify the `config/config.yml` file.
+```yaml
+BscRpcUrl: "https://bsc-dataseed.binance.org/"
+BlsDataDir: "~/.geth/bls/wallet"
+ValidatorInfo: {
+    Delegation: "2000000000000000000000", // no less than 2000 BNB
+    ConsensusAddress: "0x0000000000000000000000000000000000000000", // cannot be the same as the one you ever used on the BC side
+    Description: {
+        "moniker": "moniker", // only support alphanumeric characters and the length should be between 3 and 9
+        "identity": "identity",
+        "website": "website",
+        "details": "details"
+    },
+    Commission: {
+        "rate": 0, // 10000 == 100%
+        "maxRate": 5000, // 10000 == 100% and no more than 5000
+        "maxChangeRate": 5000 // 10000 == 100% and no more than 5000
+    }
+}
+```
+
+- `BscRpcUrl`: The RPC URL of the BSC node. e.g. `https://bsc-dataseed.binance.org/`.
+- `BlsDataDir`: The path to the BLS wallet folder. e.g. `~/.geth/bls/wallet`.
+- `ValidatorInfo`: The validator info you want to set on the BSC side. You can refer to [here](https://docs.binance.org/smart-chain/validator/validator.html#validator-info) for more information.
+
+When you are ready, you can create a validator on the BSC side by running the following command:
+
+```shell
+${workspace}/bin/bc-migration-tool create-validator \
+    --bls-password ${BLS_PASSWORD} \
+    --bls-pubkey ${BLS_PUBKEY} \
+    --operator-account ${OPERATOR_ACCOUNT} \
+    --ledger/--private-key/--keystore-path
+```
+
+- `${workspace}/bin/bc-migration-tool`: The path to the `bc-migration-tool` binary executable.
+- `--bls-password ${BLS_PASSWORD}`: The password for your BLS wallet.
+- `--bls-pubkey ${BLS_PUBKEY}`: The BLS public key you want to use.
+- `--operator-account ${OPERATOR_ACCOUNT}`: The BSC address you want to use as the operator address.
+- `--ledger/--private-key/--keystore-path`: The way you want to provide your BSC account. You can choose one of them.
+
+## Contributing
