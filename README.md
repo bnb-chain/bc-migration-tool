@@ -24,6 +24,12 @@ go build -o bin/bc-migration-tool main.go
 
 For more information of the installation and usage of `bnbcli`, you can also refer to [bnbcli](https://github.com/bnb-chain/node/blob/master/README.md).
 
+#### Option 1
+
+Download the binaries which are suitable for your platform form the [latest release](https://github.com/bnb-chain/node/releases/latest).
+
+#### Option 2
+
 ```shell
 git clone https://github.com/bnb-chain/node.git
 cd node
@@ -32,6 +38,12 @@ cp build/bnbcli ${workspace}/bin
 ```
 
 ### Install `geth`
+
+#### Option 1
+
+Download the binaries which are suitable for your platform form the [latest release](https://github.com/bnb-chain/bsc/releases/latest).
+
+#### Option 2
 
 ```shell
 git clone https://github.com/bnb-chain/bsc.git
@@ -105,11 +117,11 @@ The key info is `0x000000000000` in this case.
 
 ## Usage
 
-### Undelegate all funds on the BC side
+### Undelegate your funds on the BC side
 
 #### Undelegate
 
-You can undelegate all funds on the BC side by running the following command:
+You can undelegate your delegations (including self-delegations) on the BC side by running the following command:
 
 ```shell
 ${workspace}/bin/bnbcli staking bsc-unbond \
@@ -126,7 +138,7 @@ ${workspace}/bin/bnbcli staking bsc-unbond \
 
 - `--chain-id ${BC_CHAIN_ID}`: Specifies the chain ID for the BC(BNB beacon chain). By default, the mainnet chain ID is `Binance-Chain-Tigris`.
 
-- `--side-chain-id ${BSC_CHAIN_NAME}`: Specifies the chain ID for the BSC(BNB Smart Chain). By default, the mainnet chain ID is `56`.
+- `--side-chain-id ${BSC_CHAIN_NAME}`: Specifies the chain ID for the BSC(BNB Smart Chain). By default, the mainnet chain ID is `bsc`.
 
 - `--from ${ACCOUNT_NAME}`: Specifies the account name from which the unbonding operation will be performed.
 
@@ -139,6 +151,8 @@ ${workspace}/bin/bnbcli staking bsc-unbond \
 - `--home ${HOME}/.bnbcli`: Specifies the bnbcli home directory where the key file imported above is stored.
 
 You will be asked to input the password for your account.
+
+Be noted: As a validator operator, you should inform your delegators for manually unbond, as they will still be bonded to your validator.
 
 ### Cross-chain transfer
 
@@ -172,12 +186,6 @@ ${workspace}/bin/bnbcli bridge transfer-out \
 - `--home ${HOME}/.bnbcli`: Specifies the bnbcli home directory where the key file imported above is stored.
 
 You will be asked to input the password for your account.
-
-#### After BC-fusion
-
-After BC-fusion upgrade, the cross-chain transfer will be closed. You can recover your funds on the BSC side through the following steps:
-
-// TODO
 
 ### Create a validator on the BSC side
 
