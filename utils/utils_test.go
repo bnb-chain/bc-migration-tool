@@ -21,17 +21,21 @@ func TestLedger(t *testing.T) {
 	var wallet accounts.Wallet
 	var acc accounts.Account
 	for _, w := range ledgerHub.Wallets() {
+		if err := w.Open(""); err != nil {
+			t.Error(err)
+		}
+		fmt.Println("accounts:", w.Accounts())
+
 		if w.Contains(accounts.Account{Address: common.HexToAddress(opAccount)}) {
 			wallet = w
 			acc = accounts.Account{Address: common.HexToAddress(opAccount)}
 			break
 		}
+
+		w.Close()
 	}
 	if wallet == nil {
 		t.Error("ledger account not found")
-	}
-	if err := wallet.Open(""); err != nil {
-		t.Error(err)
 	}
 	defer wallet.Close()
 
