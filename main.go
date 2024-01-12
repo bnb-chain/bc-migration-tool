@@ -13,6 +13,7 @@ func main() {
 	rootCmd := &cobra.Command{Use: "bc-migration-tool"}
 
 	cmd.AddCreateCmd(rootCmd)
+	cmd.AddVerifyLedgerCmd(rootCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
