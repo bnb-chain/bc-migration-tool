@@ -136,7 +136,11 @@ func AddCreateCmd(rootCmd *cobra.Command) {
 
 			var signedTx *types.Transaction
 			if usingLedger {
-				signedTx, err = utils.SignTxByLedger(client, opAccount, data, delegation)
+				index, err := cmd.Flags().GetUint32(FlagIndex)
+				if err != nil {
+					return err
+				}
+				signedTx, err = utils.SignTxByLedger(client, opAccount, index, data, delegation)
 			} else if privateKey != "" {
 				signedTx, err = utils.SignTxByPrivateKey(client, privateKey, opAccount, data, delegation)
 			} else {
@@ -187,6 +191,7 @@ func AddCreateCmd(rootCmd *cobra.Command) {
 	cmd.Flags().String(FlagKeystorePath, "", "keystore path of operator account")
 	cmd.Flags().String(FlagPassword, "", "password of the keystore")
 	cmd.Flags().String(FlagOperatorAccount, "", "operator account address")
+	cmd.Flags().Uint32(FlagIndex, 0, "ledger account index")
 
 	rootCmd.AddCommand(cmd)
 }

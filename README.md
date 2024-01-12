@@ -221,7 +221,8 @@ ${workspace}/bin/bc-migration-tool create-validator \
     --bls-password ${BLS_PASSWORD} \
     --bls-pubkey ${BLS_PUBKEY} \
     --operator-account ${OPERATOR_ACCOUNT} \
-    --ledger/--private-key/--keystore-path
+    --ledger/--private-key/--keystore-path \
+    --index ${LEDGER_ACCOUNT_INDEX}
 ```
 
 - `${workspace}/bin/bc-migration-tool`: The path to the `bc-migration-tool` binary executable.
@@ -229,5 +230,6 @@ ${workspace}/bin/bc-migration-tool create-validator \
 - `--bls-pubkey ${BLS_PUBKEY}`: The BLS public key you want to use.
 - `--operator-account ${OPERATOR_ACCOUNT}`: The BSC address you want to use as the operator address.
 - `--ledger/--private-key/--keystore-path`: The way you want to provide your BSC account. You can choose one of them.
+- `--index`: To specify the account you want to use on ledger. Default is zero, means your first account.
 
 ## Contributing

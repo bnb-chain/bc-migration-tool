@@ -3,12 +3,12 @@ package utils
 import (
 	"context"
 	"crypto/ecdsa"
+	"errors"
 	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/accounts/usbwallet"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -103,28 +103,16 @@ func SignTxByKeystore(client *ethclient.Client, keystorePath, password, opAccoun
 	return signedTx, nil
 }
 
-func SignTxByLedger(client *ethclient.Client, opAccount string, data []byte, value *big.Int) (*types.Transaction, error) {
-	ledgerHub, err := usbwallet.NewLedgerHub()
+func SignTxByLedger(client *ethclient.Client, opAccount string, index uint32, data []byte, value *big.Int) (*types.Transaction, error) {
+	wallet, acc, err := OpenLedgerAccount(index)
 	if err != nil {
 		return nil, err
 	}
-
-	var wallet accounts.Wallet
-	var acc accounts.Account
-	for _, w := range ledgerHub.Wallets() {
-		if w.Contains(accounts.Account{Address: common.HexToAddress(opAccount)}) {
-			wallet = w
-			acc = accounts.Account{Address: common.HexToAddress(opAccount)}
-			break
-		}
-	}
-	if wallet == nil {
-		return nil, fmt.Errorf("ledger account not found")
-	}
-	if err := wallet.Open(""); err != nil {
-		return nil, err
-	}
 	defer wallet.Close()
+
+	if acc.Address.Hex() != opAccount {
+		return nil, errors.New("account does match, please set the correct account index")
+	}
 
 	nonce, err := client.PendingNonceAt(context.Background(), acc.Address)
 	if err != nil {
