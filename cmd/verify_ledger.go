@@ -3,8 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/bnb-chain/bc-migration-tool/utils"
+
 	"github.com/spf13/cobra"
+
+	"github.com/bnb-chain/bc-migration-tool/utils"
 )
 
 func AddVerifyLedgerCmd(rootCmd *cobra.Command) {

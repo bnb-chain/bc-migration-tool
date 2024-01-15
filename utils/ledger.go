@@ -3,14 +3,13 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/usbwallet"
-	"strings"
 )
 
-var (
-	ledgerBasePath = accounts.DerivationPath{0x80000000 + 44, 0x80000000 + 60, 0x80000000 + 0, 0, 0}
-)
+var ledgerBasePath = accounts.DerivationPath{0x80000000 + 44, 0x80000000 + 60, 0x80000000 + 0, 0, 0}
 
 func OpenLedgerAccount(index uint32) (accounts.Wallet, accounts.Account, error) {
 	ledgerHub, err := usbwallet.NewLedgerHub()
