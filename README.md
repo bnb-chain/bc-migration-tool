@@ -189,6 +189,42 @@ You will be asked to input the password for your account.
 
 ### Create a validator on the BSC side
 
+** Note **
+If you are a old validator operator on the BC side, please make a validator mapping signature by following steps.
+This can help the user to verify that the validator on the BSC side is the same as the one on the BC side.
+And user can redelegate to the new validator on the BSC side without waiting for the unbonding period.
+
+#### Local Key
+```shell
+${workspace}/bin/bnbcli \
+  validator-ownership \
+  sign-validator-ownership \
+  --bsc-operator-address ${NEW_VALIDATOR_OPERATOR_ADDR_ON_BSC} \
+  --from ${ACCOUNT_NAME} \
+  --chain-id ${BC_CHAIN_ID} \
+```
+
+#### Ledger Key
+```shell
+${workspace}/bin/bnbcli \
+  validator-ownership \
+  sign-validator-ownership \
+  --bsc-operator-address ${NEW_VALIDATOR_OPERATOR_ADDR_ON_BSC} \
+  --from ${BSC_OPERATOR_NAME} \
+  --chain-id ${CHAIN_ID} \
+  --ledger
+
+```
+
+- `${workspace}/bin/bnbcli`: The path to the `bnbcli` binary executable.
+
+- `--to ${NEW_VALIDATOR_OPERATOR_ADDR_ON_BSC}`: Specifies the BSC address to which the new validator operator address will be mapped.
+
+- `--chain-id ${BC_CHAIN_ID}`: Specifies the chain ID for the BC(BNB beacon chain). By default, the mainnet chain ID is `Binance-Chain-Tigris`.
+
+- `--from ${ACCOUNT_NAME}`: Specifies the account name from which the sign will be performed.
+
+
 First, you need to modify the `config/config.yml` file.
 ```yaml
 BscRpcUrl: "https://bsc-dataseed.binance.org/"
@@ -198,7 +234,7 @@ ValidatorInfo: {
     ConsensusAddress: "0x0000000000000000000000000000000000000000", // cannot be the same as the one you ever used on the BC side
     Description: {
         "moniker": "moniker", // only support alphanumeric characters and the length should be between 3 and 9
-        "identity": "identity",
+        "identity": "${VALIDATOR_OWNER_SHIP_SIGNATURE}", // if you are a old validator operator on the BC side, please make a validator mapping signature. or you can leave it blank or any string
         "website": "website",
         "details": "details"
     },
