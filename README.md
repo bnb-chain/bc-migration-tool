@@ -121,7 +121,8 @@ The key info is `0x000000000000` in this case.
 **Note**
 If you are an old validator operator on the BC side, please make a validator mapping signature by following steps.
 This can help the user to verify that the validator on the BSC side is the same as the one on the BC side.
-And a user can redelegate to the new validator on the BSC side without waiting for the unbonding period.
+And a user can redelegate to the new validator on the BSC side without waiting for the unbonding period via 
+cross-chain redelegation (refer to the following sections).
 
 #### Local Key
 ```shell
