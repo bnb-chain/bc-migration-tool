@@ -1,0 +1,17 @@
+BscRpcUrl: "https://bsc-dataseed.binance.org/"
+BlsDataDir: "~/.geth/bls/wallet"
+ValidatorInfo: {
+    Delegation: "5000000000000000000000",
+    ConsensusAddress: "0x0000000000000000000000000000000000000000",
+    Description: {
+        "moniker": "Test",
+        "identity": "Test",
+        "website": "Test",
+        "details": "Test"
+    },
+    Commission: {
+        "rate": 1,
+        "maxRate": 5000,
+        "maxChangeRate": 5000
+    }
+}
