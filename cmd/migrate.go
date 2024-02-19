@@ -125,6 +125,9 @@ func AddCreateCmd(rootCmd *cobra.Command) {
 				SigningRoot: msgHash,
 			}
 			proof, err := blsKm.Sign(context.Background(), &req)
+			if err != nil {
+				return err
+			}
 
 			stakeHubAbi, err := abi.StakeHubMetaData.GetAbi()
 			if err != nil {
