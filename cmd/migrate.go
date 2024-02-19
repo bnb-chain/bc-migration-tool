@@ -117,7 +117,9 @@ func AddCreateCmd(rootCmd *cobra.Command) {
 			}
 			paddedChainIdBytes := make([]byte, 32)
 			copy(paddedChainIdBytes[32-len(chainId.Bytes()):], chainId.Bytes())
-			msgHash := crypto.Keccak256(append(blsPubkey, paddedChainIdBytes...))
+
+			opAccountBz := common.HexToAddress(opAccount).Bytes()
+			msgHash := crypto.Keccak256(append(opAccountBz, append(blsPubkey, paddedChainIdBytes...)...))
 			req := validatorpb.SignRequest{
 				PublicKey:   blsPubkey,
 				SigningRoot: msgHash,
